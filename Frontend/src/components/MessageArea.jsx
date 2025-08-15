@@ -12,9 +12,10 @@ import RecieverMessage from "./RecieverMessage";
 import { serverUrl } from "../../config";
 import axios from "axios";
 import { setMessages } from "../redux/messageSlice";
+import { useEffect } from "react";
 
 const MessageArea = () => {
-  const { selectedUser, userData } = useSelector((state) => state.user);
+  const { selectedUser, userData,socket } = useSelector((state) => state.user);
   let dispatch = useDispatch();
   let { messages } = useSelector((state) => state.message);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -56,6 +57,14 @@ const MessageArea = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    socket.on("newMessage",(msg)=>{
+      dispatch(setMessages([...messages,msg]))
+    })
+    return ()=>socket.off("newMessage")
+  }, [messages,setMessages])
+  
 
   return (
     <div

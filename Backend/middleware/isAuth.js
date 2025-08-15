@@ -9,7 +9,6 @@ export const isAuth = async (req,res,next) => {
 
     const verifiedToken=await jwt.verify(token,process.env.JWT_SECRET)
     req.userId=verifiedToken.userId
-    console.log(verifiedToken)
     next()
   } catch (error) {
     return res.status(500).json({ message: `isAuth Error ${error}` });

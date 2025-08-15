@@ -5,13 +5,11 @@ import authRouter from "./routes/auth.routes.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import userRouter from "./routes/user.routes.js"
-import { editProfile } from "./controllers/user.controllers.js"
 import messageRouter from "./routes/message.route.js"
+import { app, server } from "./socket/socket.js"
 dotenv.config()
 
 const port=process.env.PORT || 5000
-
-const app=express()
 
 app.use(cors({
     origin:"http://localhost:5173",
@@ -23,7 +21,7 @@ app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 app.use("/api/message",messageRouter)
 
-app.listen(port,()=>{
+server.listen(port,()=>{
     connectDb()
     console.log(`server started at port ${port}`)
 })
