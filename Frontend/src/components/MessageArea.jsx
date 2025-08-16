@@ -15,7 +15,7 @@ import { setMessages } from "../redux/messageSlice";
 import { useEffect } from "react";
 
 const MessageArea = () => {
-  const { selectedUser, userData,socket } = useSelector((state) => state.user);
+  const { selectedUser, userData, socket } = useSelector((state) => state.user);
   let dispatch = useDispatch();
   let { messages } = useSelector((state) => state.message);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -38,6 +38,9 @@ const MessageArea = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+    if (input.length == 0 && backendImage == null) {
+      return;
+    }
     try {
       let formData = new FormData();
       formData.append("message", input);
@@ -59,12 +62,11 @@ const MessageArea = () => {
   };
 
   useEffect(() => {
-    socket.on("newMessage",(msg)=>{
-      dispatch(setMessages([...messages,msg]))
-    })
-    return ()=>socket.off("newMessage")
-  }, [messages,setMessages])
-  
+    socket.on("newMessage", (msg) => {
+      dispatch(setMessages([...messages, msg]));
+    });
+    return () => socket.off("newMessage");
+  }, [messages, setMessages]);
 
   return (
     <div
@@ -73,7 +75,7 @@ const MessageArea = () => {
       } lg:block w-full h-full bg-slate-200 border-l-2 border-gray-300 flex flex-col relative`}
     >
       {selectedUser && (
-        <div className="w-full h-[100px] bg-[#0c7ea4] rounded-b-[30px] shadow-gray-400 shadow-lg flex items-center px-[10px] gap-[20px]">
+        <div className="w-full h-[100px] bg-[#0c7ea4] rounded-b-[30px] shadow-gray-400 shadow-lg flex items-center px-[10px] gap-[20px] ">
           <div
             className="cursor-pointer"
             onClick={() => dispatch(setSelectedUser(null))}
@@ -99,14 +101,15 @@ const MessageArea = () => {
       )}
 
       {selectedUser && (
-        <div className="w-full h-[400px] overflow-auto px-[20px] py-[30px] flex flex-col gap-[20px]">
-          {messages && messages.map((msg) =>
-            msg.sender == userData._id ? (
-              <SenderMessage image={msg.image} message={msg.message} />
-            ) : (
-              <RecieverMessage image={msg.image} message={msg.message} />
-            )
-          )}
+        <div className="w-full h-[78vh] overflow-auto no-scrollbar px-[20px] py-[50px] flex flex-col gap-[25px]">
+          {messages &&
+            messages.map((msg) =>
+              msg.sender == userData._id ? (
+                <SenderMessage image={msg.image} message={msg.message} />
+              ) : (
+                <RecieverMessage image={msg.image} message={msg.message} />
+              )
+            )}
         </div>
       )}
 
@@ -136,7 +139,10 @@ const MessageArea = () => {
                     className="w-[80px] h-[80px] object-cover rounded-lg shadow"
                   />
                   <button
-                    onClick={() => setFrontendImage(null)}
+                    onClick={() => {
+                      setFrontendImage(null);
+                      setBackendImage(null);
+                    }}
                     className="absolute top-[-8px] right-[-8px] bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md hover:bg-red-600"
                   >
                     ✕
@@ -185,9 +191,12 @@ const MessageArea = () => {
                 onClick={() => image.current.click()}
               />
             </div>
-            <button>
-              <IoMdSend className="w-[25px] h-[25px] text-white cursor-pointer" />
-            </button>
+
+            {(input.length > 0 || backendImage != null) && (
+                <button>
+                  <IoMdSend className="w-[25px] h-[25px] text-white cursor-pointer" />
+                </button>
+              )}
           </form>
         </div>
       )}
