@@ -102,8 +102,13 @@ const MessageArea = () => {
 
       {selectedUser && (
         <div className="w-full h-[78vh] overflow-auto no-scrollbar px-[20px] py-[50px] flex flex-col gap-[25px]">
-          {messages &&
-            messages.map((msg) =>
+          {messages.filter(
+            (msg) =>
+              (msg.sender === userData._id &&
+                msg.receiver === selectedUser._id) ||
+              (msg.sender === selectedUser._id && msg.receiver === userData._id)
+          ) 
+            .map((msg) =>
               msg.sender == userData._id ? (
                 <SenderMessage image={msg.image} message={msg.message} />
               ) : (
@@ -193,10 +198,10 @@ const MessageArea = () => {
             </div>
 
             {(input.length > 0 || backendImage != null) && (
-                <button>
-                  <IoMdSend className="w-[25px] h-[25px] text-white cursor-pointer" />
-                </button>
-              )}
+              <button>
+                <IoMdSend className="w-[25px] h-[25px] text-white cursor-pointer" />
+              </button>
+            )}
           </form>
         </div>
       )}
